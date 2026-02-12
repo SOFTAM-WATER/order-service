@@ -1,3 +1,5 @@
+from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
+
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,7 +11,7 @@ class ProductService():
     @staticmethod
     async def create_new_product(session: AsyncSession, data):
         try:
-            product = ProductRepository.create_product(
+            product = await ProductRepository.create_product(
                 session,
                 name = data.name,
                 volume = data.volume,
@@ -25,5 +27,5 @@ class ProductService():
             raise AppError(
                 message="Failed to create product.",
                 code=ErrorCode.PRODUCT_CREATE_FAILED,
-                status_code=500
+                status_code=HTTP_500_INTERNAL_SERVER_ERROR
             )

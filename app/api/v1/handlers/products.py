@@ -19,5 +19,4 @@ async def create_product(
     product: CreateProductRequest,
     session: AsyncSession = Depends(get_async_session)
 ):
-    created = await ProductService.create_new_product(session, product)
-    return created
+    return await ProductService.create_new_product(session, product)
