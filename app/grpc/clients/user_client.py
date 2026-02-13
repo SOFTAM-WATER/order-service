@@ -1,6 +1,13 @@
 import grpc
 from uuid import UUID
-from starlette.status import HTTP_504_GATEWAY_TIMEOUT, HTTP_503_SERVICE_UNAVAILABLE, HTTP_502_BAD_GATEWAY
+from starlette.status import (
+    HTTP_400_BAD_REQUEST,
+    HTTP_403_FORBIDDEN,
+    HTTP_404_NOT_FOUND,
+    HTTP_504_GATEWAY_TIMEOUT,
+    HTTP_503_SERVICE_UNAVAILABLE,
+    HTTP_502_BAD_GATEWAY,
+)
 
 import app.grpc.generated.user_service_pb2 as user_pb2
 import app.grpc.generated.user_service_pb2_grpc as user_pb2_grpc
@@ -29,28 +36,29 @@ class UserClient:
 
         try:
             resp = await self._stub.ValidateTelegramUser(request, timeout=2.0)
+
         except grpc.aio.AioRpcError as e:
-            if e.code() == grpc.StatusCode.DEADLINE_EXCEEDED:
-                raise AppError(
-                    message="User service timeout.",
-                    code=ErrorCode.USER_SVC_TIMEOUT,
-                    status_code=HTTP_504_GATEWAY_TIMEOUT
-                )
-            if e.code() in (grpc.StatusCode.UNAVAILABLE, grpc.StatusCode.RESOURCE_EXHAUSTED):
-                raise AppError(
-                    message="User service unuvailable.",
-                    code=ErrorCode.USER_SVC_UNAVAILABLE,
-                    status_code=HTTP_503_SERVICE_UNAVAILABLE
-                )
-            raise AppError(
-                message="User Service Error.",
-                code=ErrorCode.USER_SVC_ERROR,
-                status_code=HTTP_502_BAD_GATEWAY
-            )
+            print("gRPC code:", e.code())
+            print("gRPC details:", e.details())
+            print("gRPC debug:", e.debug_error_string())
+ 
+            code = e.code()
 
-
-        if resp.status != user_pb2.VALID:
-            raise ValueError("User validation failed")
+            # transport / infra
+            if code == grpc.StatusCode.DEADLINE_EXCEEDED:
+                raise AppError("User service timeout.", ErrorCode.USER_SVC_TIMEOUT, HTTP_504_GATEWAY_TIMEOUT)
+            if code in (grpc.StatusCode.UNAVAILABLE, grpc.StatusCode.RESOURCE_EXHAUSTED):
+                raise AppError("User service unuvailable.", ErrorCode.USER_SVC_UNAVAILABLE, HTTP_503_SERVICE_UNAVAILABLE)
+            
+            #business errors from user_service
+            if code == grpc.StatusCode.INVALID_ARGUMENT:
+                raise AppError("Invalid user data", ErrorCode.USER_INVALID_DATA, HTTP_400_BAD_REQUEST)
+            if code == grpc.StatusCode.NOT_FOUND:
+                raise AppError("User not found", ErrorCode.USER_NOT_FOUND, HTTP_404_NOT_FOUND)
+            if code == grpc.StatusCode.PERMISSION_DENIED:
+                raise AppError("User is blocked", ErrorCode.USER_BLOCKED, HTTP_403_FORBIDDEN)
+            
+            raise AppError("User Service Error.", ErrorCode.USER_SVC_ERROR, HTTP_502_BAD_GATEWAY)
 
         return UUID(resp.user_id)
 
