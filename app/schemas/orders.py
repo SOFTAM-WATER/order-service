@@ -6,6 +6,8 @@ from pydantic import BaseModel, Field
 
 from app.utils.custom_types import OrderStatus, created_at, closed_at
 
+class OrderID(BaseModel):
+    id: UUID
 
 class CreateOrderItemRequest(BaseModel):
     product_id: UUID 
@@ -38,6 +40,8 @@ class OrderItemResponce(BaseModel):
     class Config:
         from_attributes = True
 
+class OrderDB(OrderID, CreateOrderRequest):
+    pass
 
 class OrderResponce(BaseModel):
     id: UUID

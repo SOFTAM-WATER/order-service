@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-import app.grpc.generated.user_service_pb2 as user__service__pb2
+import app.grpc.generated.order_draft_pb2 as order__draft__pb2
 
 GRPC_GENERATED_VERSION = '1.78.0'
 GRPC_VERSION = grpc.__version__
@@ -18,14 +18,14 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + ' but the generated code in user_service_pb2_grpc.py depends on'
+        + ' but the generated code in order_draft_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
     )
 
 
-class UserServiceStub(object):
+class OrderServiceStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -34,43 +34,43 @@ class UserServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.ValidateTelegramUser = channel.unary_unary(
-                '/users.v1.UserService/ValidateTelegramUser',
-                request_serializer=user__service__pb2.ValidateUserRequest.SerializeToString,
-                response_deserializer=user__service__pb2.ValidateUserResponse.FromString,
+        self.CreateOrderFromDraft = channel.unary_unary(
+                '/draft.v1.OrderService/CreateOrderFromDraft',
+                request_serializer=order__draft__pb2.CreateOrderRequest.SerializeToString,
+                response_deserializer=order__draft__pb2.OrderResponse.FromString,
                 _registered_method=True)
 
 
-class UserServiceServicer(object):
+class OrderServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def ValidateTelegramUser(self, request, context):
+    def CreateOrderFromDraft(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
 
-def add_UserServiceServicer_to_server(servicer, server):
+def add_OrderServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'ValidateTelegramUser': grpc.unary_unary_rpc_method_handler(
-                    servicer.ValidateTelegramUser,
-                    request_deserializer=user__service__pb2.ValidateUserRequest.FromString,
-                    response_serializer=user__service__pb2.ValidateUserResponse.SerializeToString,
+            'CreateOrderFromDraft': grpc.unary_unary_rpc_method_handler(
+                    servicer.CreateOrderFromDraft,
+                    request_deserializer=order__draft__pb2.CreateOrderRequest.FromString,
+                    response_serializer=order__draft__pb2.OrderResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'users.v1.UserService', rpc_method_handlers)
+            'draft.v1.OrderService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('users.v1.UserService', rpc_method_handlers)
+    server.add_registered_method_handlers('draft.v1.OrderService', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
-class UserService(object):
+class OrderService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def ValidateTelegramUser(request,
+    def CreateOrderFromDraft(request,
             target,
             options=(),
             channel_credentials=None,
@@ -83,9 +83,9 @@ class UserService(object):
         return grpc.experimental.unary_unary( #type:ignore
             request,
             target,
-            '/users.v1.UserService/ValidateTelegramUser',
-            user__service__pb2.ValidateUserRequest.SerializeToString,
-            user__service__pb2.ValidateUserResponse.FromString,
+            '/draft.v1.OrderService/CreateOrderFromDraft',
+            order__draft__pb2.CreateOrderRequest.SerializeToString,
+            order__draft__pb2.OrderResponse.FromString,
             options,
             channel_credentials,
             insecure,

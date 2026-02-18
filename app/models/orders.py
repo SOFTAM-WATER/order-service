@@ -1,14 +1,16 @@
 import datetime
 
-from sqlalchemy import String, Integer, Enum as SqlEnum, ForeignKey, CheckConstraint, Date, Time
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import String, Integer, Enum as SqlEnum, ForeignKey, CheckConstraint, Date, Time
 
 from app.database.db import Base
-from app.utils.custom_types import uuint_pk, uuid_ref, created_at, closed_at, OrderStatus
-from app.models.products import Product
+from app.schemas.orders import OrderDB
+from app.utils.custom_types import uuint_pk, uuid_ref, created_at, closed_at, OrderStatus, transaction_id
 
+class BaseModel(Base):
+    __abstract__ = True
 
-class Order(Base):
+class Order(BaseModel):
     __tablename__ = "orders"
 
     __table_args__ = (
@@ -17,6 +19,7 @@ class Order(Base):
     )
 
     id: Mapped[uuint_pk]
+    transaction_id: Mapped[transaction_id] 
     user_id: Mapped[uuid_ref]
     full_name: Mapped[str] = mapped_column(String(50))
     phone: Mapped[str] = mapped_column(String(50))
@@ -42,8 +45,11 @@ class Order(Base):
         cascade="all, delete-orphan"
     )
 
+    def to_schema(self) -> OrderDB:
+        return OrderDB(**self.__dict__)
 
-class OrderItem(Base):
+
+class OrderItem(BaseModel):
     __tablename__ = "order_items"
 
     __table_args__ = (
@@ -59,14 +65,9 @@ class OrderItem(Base):
         index=True
     )
 
-    product_id: Mapped[uuid_ref] = mapped_column(
-        ForeignKey("products.id"),
-        nullable=False,
-        index=True
-    )
+    product_id: Mapped[uuid_ref]
 
     quantity: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     price: Mapped[int] = mapped_column(Integer, nullable=False)
 
     order: Mapped[Order] = relationship(back_populates="items")
-    product: Mapped[Product] = relationship()

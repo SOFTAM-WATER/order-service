@@ -1,4 +1,5 @@
 from enum import Enum
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
@@ -8,7 +9,17 @@ from app.api.v1.handlers.orders import router as orders_router
 from app.api.v1.handlers.products import router as products_router
 from app.grpc.clients.user_client import UserClient
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    app.state.user_client = UserClient("localhost:50051")
+    yield 
+
+    await app.state.user_client.close()
+
+
+app = FastAPI(lifespan=lifespan)
+
 
 @app.exception_handler(AppError)
 async def app_error_handler(request: Request, exc: AppError):
@@ -23,7 +34,6 @@ async def app_error_handler(request: Request, exc: AppError):
         }
     )
 
-app.state.user_client = UserClient("localhost:50051")
 
 app.include_router(orders_router)
 app.include_router(products_router)

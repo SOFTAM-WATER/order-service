@@ -12,11 +12,3 @@ async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 Base = declarative_base()
 
 
-async def get_async_connection() -> AsyncGenerator[AsyncConnection, None]:
-    async with engine.begin() as conn:
-        yield conn
-
-
-async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
-    async with async_session_maker() as session:
-        yield session

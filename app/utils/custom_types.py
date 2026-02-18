@@ -24,6 +24,11 @@ uuid_ref = Annotated[
     mapped_column(PG_UUID(as_uuid=True), nullable=False, index=True)
 ]
 
+transaction_id = Annotated[
+    UUID,
+    mapped_column(PG_UUID(as_uuid=True), unique=True, index=True, nullable=False)
+]
+
 dt_now_utc_sql = text("now()")
 created_at = Annotated[
     datetime,
