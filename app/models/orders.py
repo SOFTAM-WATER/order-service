@@ -69,5 +69,6 @@ class OrderItem(BaseModel):
 
     quantity: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     price: Mapped[int] = mapped_column(Integer, nullable=False)
+    subtotal_price: Mapped[int] = mapped_column(Integer, nullable=False)
 
     order: Mapped[Order] = relationship(back_populates="items")

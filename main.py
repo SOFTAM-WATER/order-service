@@ -1,3 +1,4 @@
+import asyncio
 from enum import Enum
 from contextlib import asynccontextmanager
 
@@ -5,14 +6,16 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from app.core.errors import AppError
-from app.api.v1.handlers.orders import router as orders_router
-from app.api.v1.handlers.products import router as products_router
-from app.grpc.clients.user_client import UserClient
+from app.grpc.server import run_grpc_server
+from scripts.init_models import init_models
+from app.database.db import engine
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.user_client = UserClient("localhost:50051")
+    grpc_task = asyncio.create_task(run_grpc_server())    
+    await init_models(engine)
+    
     yield 
 
     await app.state.user_client.close()
@@ -33,10 +36,6 @@ async def app_error_handler(request: Request, exc: AppError):
             "details": exc.details if exc.details else "no details"
         }
     )
-
-
-app.include_router(orders_router)
-app.include_router(products_router)
 
 @app.on_event("shutdown")
 async def shutdown():

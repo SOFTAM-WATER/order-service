@@ -80,7 +80,7 @@ class OrderService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary( #type:ignore
+        return grpc.experimental.unary_unary( # type:ignore
             request,
             target,
             '/draft.v1.OrderService/CreateOrderFromDraft',

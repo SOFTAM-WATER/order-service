@@ -9,7 +9,7 @@ from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class OrderItem(_message.Message):
-    __slots__ = ("product_id", "quantity", "subtotal_price")
+    __slots__ = ("product_id", "quantity", "subtotal_price") #type:ignore
     PRODUCT_ID_FIELD_NUMBER: _ClassVar[int]
     QUANTITY_FIELD_NUMBER: _ClassVar[int]
     SUBTOTAL_PRICE_FIELD_NUMBER: _ClassVar[int]
@@ -19,7 +19,7 @@ class OrderItem(_message.Message):
     def __init__(self, product_id: _Optional[str] = ..., quantity: _Optional[int] = ..., subtotal_price: _Optional[int] = ...) -> None: ...
 
 class CreateOrderRequest(_message.Message):
-    __slots__ = ("transaction_id", "user_id", "full_name", "phone", "location", "total_sum", "delivery_date", "slot_from", "slot_to", "items")
+    __slots__ = ("transaction_id", "user_id", "full_name", "phone", "location", "total_sum", "delivery_date", "slot_from", "slot_to", "items") #type:ignore
     TRANSACTION_ID_FIELD_NUMBER: _ClassVar[int]
     USER_ID_FIELD_NUMBER: _ClassVar[int]
     FULL_NAME_FIELD_NUMBER: _ClassVar[int]
@@ -43,7 +43,7 @@ class CreateOrderRequest(_message.Message):
     def __init__(self, transaction_id: _Optional[str] = ..., user_id: _Optional[str] = ..., full_name: _Optional[str] = ..., phone: _Optional[str] = ..., location: _Optional[str] = ..., total_sum: _Optional[int] = ..., delivery_date: _Optional[_Union[_date_pb2.Date, _Mapping]] = ..., slot_from: _Optional[_Union[_timeofday_pb2.TimeOfDay, _Mapping]] = ..., slot_to: _Optional[_Union[_timeofday_pb2.TimeOfDay, _Mapping]] = ..., items: _Optional[_Iterable[_Union[OrderItem, _Mapping]]] = ...) -> None: ...
 
 class OrderResponse(_message.Message):
-    __slots__ = ("order_id", "status")
+    __slots__ = ("order_id", "status") #type:ignore
     ORDER_ID_FIELD_NUMBER: _ClassVar[int]
     STATUS_FIELD_NUMBER: _ClassVar[int]
     order_id: str

@@ -8,6 +8,7 @@ load_dotenv(find_dotenv(".env"))
 
 class Settings(BaseSettings):
     database_url: str = os.getenv("DATABASE_URL", "")
+    grpc_port: int = 50052
 
     model_config={
         "env_file": ".env",
